@@ -36,16 +36,38 @@ namespace ProfileKeyConditions
             }
         }
 
-        protected abstract bool Comparison { get; }
+        protected abstract double GetAdjustedComparisonValue(double rawVal);
 
         protected override bool Execute(T ruleContext)
         {
             Assert.ArgumentNotNull((object)ruleContext, "ruleContext");
+            double comparisonVal1 = GetProfileKeyValue(ProfileKeyId1);
+            double profileKeyVal2 = GetProfileKeyValue(ProfileKeyId2);
+            double comparisonVal2 = GetAdjustedComparisonValue(profileKeyVal2);
+            return ValuesCompare(comparisonVal1, comparisonVal2, GetOperator());
+        }
 
-            double profileKeyValue1 = this.GetProfileKeyValue(ProfileKeyId1);
-            double profileKeyValue2 = this.GetProfileKeyValue(ProfileKeyId2);
+        private bool ValuesCompare(double val1, double val2,ConditionOperator op)
+        {
+            Sitecore.Diagnostics.Log.Info(val1.ToString() + " >= " + val2.ToString() + (val1 >= val2 ? ": true" : " false"),this);
 
-            return Comparison;
+            switch (op)
+            {
+                case ConditionOperator.Equal:
+                    return val1 == val2;
+                case ConditionOperator.GreaterThanOrEqual:
+                    return val1 >= val2;
+                case ConditionOperator.GreaterThan:
+                    return val1 > val2;
+                case ConditionOperator.LessThanOrEqual:
+                    return ProfileKeyValue1 <= val2;
+                case ConditionOperator.LessThan:
+                    return val1 < val2;
+                case ConditionOperator.NotEqual:
+                    return val1 != val2;
+                default:
+                    return false;
+            }          
         }
 
         private double GetProfileKeyValue(string profileKeyId)
@@ -62,7 +84,7 @@ namespace ProfileKeyConditions
 
             if (profileItem == null)
                 return 0.0;
-
+            
             Tracker.Visitor.Load(new VisitorLoadOptions()
             {
                 Start = Tracker.Visitor.GetOrCreateCurrentVisit().VisitorVisitIndex,
@@ -72,12 +94,12 @@ namespace ProfileKeyConditions
             });
 
             String profileItemName = profileItem.Name.ToLower();
-            IEnumerable<VisitorDataSet.ProfilesRow> allProfiles = Tracker.CurrentVisit.Profiles;
+            IEnumerable<VisitorDataSet.ProfilesRow> allProfiles = Tracker.CurrentVisit.Profiles;           
             VisitorDataSet.ProfilesRow row = allProfiles.FirstOrDefault(r => r.ProfileName.ToLower() == profileItemName);
-
+            
             if (row == null)
                 return 0.0;
-
+            
             return (double)row.GetValue(profileKeyItem.Name);
         }
     }
