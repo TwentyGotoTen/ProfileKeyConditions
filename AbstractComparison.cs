@@ -49,8 +49,6 @@ namespace ProfileKeyConditions
 
         private bool ValuesCompare(double val1, double val2,ConditionOperator op)
         {
-            Sitecore.Diagnostics.Log.Info(val1.ToString() + " >= " + val2.ToString() + (val1 >= val2 ? ": true" : " false"),this);
-
             switch (op)
             {
                 case ConditionOperator.Equal:
