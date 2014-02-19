@@ -13,7 +13,7 @@ using System.Linq;
 namespace ProfileKeyConditions
 {
     [UsedImplicitly]
-    public class Difference<T> : AbstractComparison<T> where T : RuleContext
+    public class DifferenceComparison<T> : AbstractComparison<T> where T : RuleContext
     {
         public String Adjustment { get; set; }
 
@@ -29,3 +29,4 @@ namespace ProfileKeyConditions
         } 
     }
 }
+C:\Development\GitHub\ProfileKeyConditions\ProfileKeyConditions\DifferenceComparison.cs
